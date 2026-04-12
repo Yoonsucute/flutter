@@ -1,16 +1,5 @@
 # leductien_2224802010896_lab2
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9e702b2e-5b87-4b09-b64f-b654e7c1371e" />
 
-A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Link demo:https://drive.google.com/file/d/1iG1R-l47TOEE3C_dY2_9d0pZG7of7DQC/view?usp=sharing
