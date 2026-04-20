@@ -10,6 +10,7 @@ class DisplayArea extends StatelessWidget {
   final double fontScale;
   final List<CalculationHistory> histories;
   final ValueChanged<CalculationHistory> onHistoryTap;
+  final bool hasEvaluated;
 
   const DisplayArea({
     super.key,
@@ -20,6 +21,7 @@ class DisplayArea extends StatelessWidget {
     required this.fontScale,
     required this.histories,
     required this.onHistoryTap,
+    required this.hasEvaluated,
   });
 
   @override
@@ -88,67 +90,56 @@ class DisplayArea extends StatelessWidget {
             ),
           if (histories.isNotEmpty) const SizedBox(height: 12),
 
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              previousResult.isEmpty ? '' : 'Ans: $previousResult',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 16 * fontScale,
-                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.65),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
           Expanded(
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.centerRight,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerRight,
-                child: Text(
-                  expression.isEmpty ? '0' : expression,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 28 * fontScale,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: errorMessage.isNotEmpty
-                  ? Text(
-                      errorMessage,
-                      key: ValueKey(errorMessage),
-                      style: TextStyle(
-                        color: theme.colorScheme.error,
-                        fontSize: 16 * fontScale,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    )
-                  : Text(
-                      result,
-                      key: ValueKey(result),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 38 * fontScale,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.tertiary,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (errorMessage.isNotEmpty)
+                  Text(
+                    errorMessage,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: theme.colorScheme.error,
+                      fontSize: 24 * fontScale,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  )
+                else ...[
+                  if (expression.isNotEmpty)
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          expression,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            color: theme.textTheme.bodyMedium?.color,
+                            fontSize: 24 * fontScale,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
+                  if (hasEvaluated && result.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Ans: $result',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          color: theme.colorScheme.tertiary,
+                          fontSize: 38 * fontScale,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ],
             ),
           ),
         ],

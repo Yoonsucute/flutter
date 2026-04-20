@@ -72,19 +72,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               Expanded(
                 flex: 3,
                 child: DisplayArea(
-  expression: calculatorProvider.result,
-  result: calculatorProvider.displayExpression,
-  previousResult: calculatorProvider.previousResult,
-  errorMessage: calculatorProvider.errorMessage,
-  fontScale: calculatorProvider.settings.fontScale,
-  histories: historyProvider.histories.take(3).toList(),
-  onHistoryTap: (item) {
-    calculatorProvider.clearEntry();
-    calculatorProvider.appendValue(item.expression);
-  },
-),
+                  expression: calculatorProvider.displayExpression,
+                  result: calculatorProvider.result,
+                  previousResult: calculatorProvider.previousResult,
+                  errorMessage: calculatorProvider.errorMessage,
+                  fontScale: calculatorProvider.settings.fontScale,
+                  histories: historyProvider.histories.take(3).toList(),
+                  hasEvaluated: calculatorProvider.hasEvaluated,
+                  onHistoryTap: (item) {
+                    calculatorProvider.setExpression(item.expression);
+                  },
                 ),
-              
+              ),
               Expanded(
                 flex: 5,
                 child: ButtonGrid(
@@ -94,17 +93,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
                     switch (value) {
                       case 'C':
-                        cp.clearAll();
+                        cp.deleteLast();
                         break;
                       case 'CE':
-                        cp.clearEntry();
+                        cp.clearEntryAndMemory();
                         break;
                       case '⌫':
                         cp.deleteLast();
                         break;
                       case '=':
-                        final expressionBefore = cp.expression;
+                        final expressionBefore = cp.displayExpression;
                         final result = cp.evaluateExpression();
+
                         if (cp.errorMessage.isEmpty &&
                             expressionBefore.isNotEmpty) {
                           await historyProvider.addHistory(
@@ -133,14 +133,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         cp.memorySubtract();
                         break;
                       case 'BIN':
-                      case 'OCT':
-                      case 'DEC':
-                      case 'HEX':
-                      case 'NOT':
-                      case '<<1':
-                      case '>>1':
-                        cp.applyProgrammerOperation(value);
-                        break;
+case 'OCT':
+case 'DEC':
+case 'HEX':
+case 'NOT':
+case 'AND':
+case 'OR':
+case 'XOR':
+case '<<1':
+case '>>1':
+  cp.applyProgrammerOperation(value);
+  break;
                       default:
                         cp.appendValue(value);
                     }

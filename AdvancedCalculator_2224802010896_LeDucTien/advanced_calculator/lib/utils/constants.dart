@@ -19,13 +19,15 @@ class AppConstants {
   ];
 
   static const List<String> programmerButtons = [
-    'BIN', 'OCT', 'DEC', 'HEX',
-    'AND', 'OR', 'XOR', 'NOT',
-    '7', '8', '9', '<<1',
-    '4', '5', '6', '>>1',
-    '1', '2', '3', 'C',
-    '0', '.', '=', 'CE',
-  ];
+  'BIN', 'OCT', 'DEC', 'HEX', 'CE',
+  'AND', 'OR', 'XOR', 'NOT', '⌫',
+
+  'A', 'B', 'C', 'D', 'E',
+  'F', '7', '8', '9', '<<1',
+
+  '4', '5', '6', '0', '>>1',
+  '1', '2', '3', '=', '',
+];
 
   static List<String> getButtonsForMode(CalculatorMode mode) {
     switch (mode) {

@@ -21,19 +21,25 @@ class ButtonGrid extends StatelessWidget {
     final buttons = AppConstants.getButtonsForMode(mode);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         itemCount: buttons.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: _crossAxisCount(mode),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           childAspectRatio: _childAspectRatio(mode),
         ),
         itemBuilder: (context, index) {
           final label = buttons[index];
-          final isClear = label == 'C';
+
+          if (label.isEmpty) {
+            return const SizedBox.shrink();
+          }
+
+          final isClear = label == 'C' || label == '⌫';
+
           return CalculatorButton(
             label: label,
             onPressed: () => onButtonPressed(label),
@@ -51,18 +57,18 @@ class ButtonGrid extends StatelessWidget {
       case CalculatorMode.scientific:
         return 6;
       case CalculatorMode.programmer:
-        return 4;
+        return 5;
     }
   }
 
   double _childAspectRatio(CalculatorMode mode) {
     switch (mode) {
       case CalculatorMode.basic:
-        return 1.2;
+        return 1.18;
       case CalculatorMode.scientific:
-        return 1.15;
+        return 1.08;
       case CalculatorMode.programmer:
-        return 1.4;
+        return 1.20;
     }
   }
 }

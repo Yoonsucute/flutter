@@ -25,6 +25,8 @@ class _CalculatorButtonState extends State<CalculatorButton> {
     final isOperator = _isOperatorButton(widget.label);
     final isEqual = widget.label == '=';
     final isMemory = ['MC', 'MR', 'M+', 'M-'].contains(widget.label);
+    final isBase = ['BIN', 'OCT', 'DEC', 'HEX'].contains(widget.label);
+    final isHexLetter = ['A', 'B', 'C', 'D', 'E', 'F'].contains(widget.label);
 
     Color backgroundColor = theme.colorScheme.secondary.withOpacity(0.14);
     Color foregroundColor = theme.textTheme.bodyLarge?.color ?? Colors.black;
@@ -34,8 +36,12 @@ class _CalculatorButtonState extends State<CalculatorButton> {
       foregroundColor = theme.colorScheme.tertiary;
     }
 
-    if (isMemory) {
+    if (isMemory || isBase) {
       backgroundColor = theme.colorScheme.primary.withOpacity(0.10);
+    }
+
+    if (isHexLetter) {
+      backgroundColor = theme.colorScheme.secondary.withOpacity(0.20);
     }
 
     if (isEqual) {
@@ -49,7 +55,7 @@ class _CalculatorButtonState extends State<CalculatorButton> {
       onTapCancel: () => setState(() => _isPressed = false),
       onLongPress: widget.onLongPress,
       child: AnimatedScale(
-        scale: _isPressed ? 0.94 : 1.0,
+        scale: _isPressed ? 0.95 : 1.0,
         duration: const Duration(milliseconds: 120),
         child: Material(
           color: backgroundColor,
@@ -58,12 +64,18 @@ class _CalculatorButtonState extends State<CalculatorButton> {
             borderRadius: BorderRadius.circular(16),
             onTap: widget.onPressed,
             child: Center(
-              child: Text(
-                widget.label,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: foregroundColor,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: _fontSize(widget.label),
+                      fontWeight: FontWeight.w600,
+                      color: foregroundColor,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -71,6 +83,14 @@ class _CalculatorButtonState extends State<CalculatorButton> {
         ),
       ),
     );
+  }
+
+  double _fontSize(String label) {
+    if (['BIN', 'OCT', 'DEC', 'HEX', 'AND', 'XOR', 'NOT', '<<1', '>>1']
+        .contains(label)) {
+      return 18;
+    }
+    return 22;
   }
 
   bool _isOperatorButton(String value) {

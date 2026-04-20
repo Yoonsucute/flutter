@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/calculator_provider.dart';
 import '../providers/history_provider.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -45,7 +46,11 @@ class HistoryScreen extends StatelessWidget {
                 final item = histories[index];
                 return ListTile(
                   leading: const Icon(Icons.calculate_outlined),
-                  title: Text(item.expression),
+                  title: Text(
+                    CalculatorProvider.formatExpressionForDisplay(
+                      item.expression,
+                    ),
+                  ),
                   subtitle: Text(
                     'Kết quả: ${item.result}\n'
                     '${DateFormat('dd/MM/yyyy HH:mm').format(item.timestamp)}',

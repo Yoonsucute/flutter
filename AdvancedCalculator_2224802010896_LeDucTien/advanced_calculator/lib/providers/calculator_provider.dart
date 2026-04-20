@@ -12,14 +12,22 @@ class CalculatorProvider extends ChangeNotifier {
   CalculatorProvider(this._storageService);
 
   String _expression = '';
-  String _result = '0';
+  String _displayInput = '';
+  String _result = '';
   String _previousResult = '';
   String _errorMessage = '';
   double _memoryValue = 0;
   CalculatorMode _mode = CalculatorMode.basic;
   CalculatorSettings _settings = CalculatorSettings.defaultSettings();
+  bool _isTyping = false;
+  bool _hasEvaluated = false;
+
+  int _programmerBase = 10;
+  int? _programmerStoredValue;
+  String? _programmerPendingOperator;
 
   String get expression => _expression;
+  String get displayInput => _displayInput;
   String get result => _result;
   String get previousResult => _previousResult;
   String get errorMessage => _errorMessage;
@@ -27,14 +35,35 @@ class CalculatorProvider extends ChangeNotifier {
   CalculatorMode get mode => _mode;
   CalculatorSettings get settings => _settings;
   bool get hasMemory => _memoryValue != 0;
+  bool get isTyping => _isTyping;
+  bool get hasEvaluated => _hasEvaluated;
 
-  String get displayExpression {
-    if (_expression.isEmpty) return '0';
+  String get displayExpression => _displayInput;
 
-    return _expression
+  static String formatExpressionForDisplay(String expression) {
+    if (expression.isEmpty) return '';
+
+    var formatted = expression
         .replaceAll('pi', 'π')
         .replaceAll('*', '×')
-        .replaceAll('/', '÷');
+        .replaceAll('/', '÷')
+        .replaceAll('^2', '²')
+        .replaceAll('^3', '³');
+
+    formatted = formatted.replaceAllMapped(
+      RegExp(r'sqrt\(([^)]+)\)'),
+      (match) => '√${match[1]}',
+    );
+
+    formatted = formatted
+        .replaceAll('sqrt(', '√')
+        .replaceAll('sin(', 'sin(')
+        .replaceAll('cos(', 'cos(')
+        .replaceAll('tan(', 'tan(')
+        .replaceAll('log(', 'log(')
+        .replaceAll('ln(', 'ln(');
+
+    return formatted;
   }
 
   Future<void> loadSettings() async {
@@ -50,96 +79,306 @@ class CalculatorProvider extends ChangeNotifier {
     await _storageService.saveMemoryValue(_memoryValue);
   }
 
-  void appendValue(String value) {
+  void setExpression(String rawExpression) {
+    _expression = rawExpression;
+    _displayInput = formatExpressionForDisplay(rawExpression);
+    _result = '';
     _errorMessage = '';
+    _isTyping = true;
+    _hasEvaluated = false;
 
-    switch (value) {
-      case 'π':
-        _expression += 'pi';
-        break;
-      case 'e':
-        _expression += 'e';
-        break;
-      case '×':
-        _expression += '*';
-        break;
-      case '÷':
-        _expression += '/';
-        break;
-      case '−':
-        _expression += '-';
-        break;
-      case '√':
-        _expression += 'sqrt(';
-        break;
-      case 'x²':
-        _expression += '^2';
-        break;
-      case 'x³':
-        _expression += '^3';
-        break;
-      case 'xʸ':
-        _expression += '^';
-        break;
-      case 'ln':
-        _expression += 'ln(';
-        break;
-      case 'log':
-        _expression += 'log(';
-        break;
-      case 'sin':
-        _expression += 'sin(';
-        break;
-      case 'cos':
-        _expression += 'cos(';
-        break;
-      case 'tan':
-        _expression += 'tan(';
-        break;
-      case 'mod':
-        _expression += '%';
-        break;
-      default:
-        _expression += value;
+    if (_mode == CalculatorMode.programmer) {
+      _programmerStoredValue = null;
+      _programmerPendingOperator = null;
     }
 
     notifyListeners();
   }
 
+  void appendValue(String value) {
+    if (_mode == CalculatorMode.programmer) {
+      _appendProgrammerValue(value);
+      return;
+    }
+
+    _errorMessage = '';
+    _isTyping = true;
+    _hasEvaluated = false;
+
+    String rawValue = value;
+    String shownValue = value;
+
+    switch (value) {
+      case 'π':
+        rawValue = 'pi';
+        shownValue = 'π';
+        break;
+      case 'e':
+        rawValue = 'e';
+        shownValue = 'e';
+        break;
+      case '×':
+        rawValue = '*';
+        shownValue = '×';
+        break;
+      case '÷':
+        rawValue = '/';
+        shownValue = '÷';
+        break;
+      case '−':
+        rawValue = '-';
+        shownValue = '−';
+        break;
+      case '√':
+        rawValue = 'sqrt(';
+        shownValue = '√';
+        break;
+      case 'x²':
+        rawValue = '^2';
+        shownValue = '²';
+        break;
+      case 'x³':
+        rawValue = '^3';
+        shownValue = '³';
+        break;
+      case 'xʸ':
+        rawValue = '^';
+        shownValue = '^';
+        break;
+      case 'ln':
+        rawValue = 'ln(';
+        shownValue = 'ln(';
+        break;
+      case 'log':
+        rawValue = 'log(';
+        shownValue = 'log(';
+        break;
+      case 'sin':
+        rawValue = 'sin(';
+        shownValue = 'sin(';
+        break;
+      case 'cos':
+        rawValue = 'cos(';
+        shownValue = 'cos(';
+        break;
+      case 'tan':
+        rawValue = 'tan(';
+        shownValue = 'tan(';
+        break;
+      case 'mod':
+        rawValue = '%';
+        shownValue = 'mod';
+        break;
+      default:
+        rawValue = value;
+        shownValue = value;
+    }
+
+    _expression += rawValue;
+    _displayInput += shownValue;
+    _result = '';
+    notifyListeners();
+  }
+
+  void _appendProgrammerValue(String value) {
+    _errorMessage = '';
+
+    if (_hasEvaluated && _programmerPendingOperator == null) {
+      _expression = '';
+      _displayInput = '';
+      _result = '';
+      _hasEvaluated = false;
+    }
+
+    final upper = value.toUpperCase();
+
+    if (!_isAllowedInCurrentBase(upper)) return;
+
+    _expression += upper;
+    _displayInput += upper;
+    _result = '';
+    _isTyping = true;
+    _hasEvaluated = false;
+    notifyListeners();
+  }
+
+  bool _isAllowedInCurrentBase(String value) {
+    const hexLetters = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+    if (RegExp(r'^\d$').hasMatch(value)) {
+      return int.parse(value) < _programmerBase;
+    }
+
+    if (hexLetters.contains(value)) {
+      return _programmerBase == 16;
+    }
+
+    return false;
+  }
+
   void clearAll() {
     _expression = '';
-    _result = '0';
+    _displayInput = '';
+    _result = '';
     _previousResult = '';
     _errorMessage = '';
+    _isTyping = false;
+    _hasEvaluated = false;
+    _programmerStoredValue = null;
+    _programmerPendingOperator = null;
     notifyListeners();
   }
 
   void clearEntry() {
     _expression = '';
+    _displayInput = '';
     _errorMessage = '';
+    _result = '';
+    _isTyping = false;
+    _hasEvaluated = false;
+
+    if (_mode == CalculatorMode.programmer) {
+      _programmerStoredValue = null;
+      _programmerPendingOperator = null;
+    }
+
+    notifyListeners();
+  }
+
+  void clearEntryAndMemory() {
+    _expression = '';
+    _displayInput = '';
+    _result = '';
+    _previousResult = '';
+    _errorMessage = '';
+    _memoryValue = 0;
+    _isTyping = false;
+    _hasEvaluated = false;
+    _programmerStoredValue = null;
+    _programmerPendingOperator = null;
+    saveSettings();
     notifyListeners();
   }
 
   void deleteLast() {
+    if (_mode == CalculatorMode.programmer) {
+      _deleteLastProgrammer();
+      return;
+    }
+
+    if (_displayInput.isEmpty) return;
+
+    final complexTokens = <Map<String, String>>[
+      {'display': ' M+', 'raw': ''},
+      {'display': ' M-', 'raw': ''},
+      {'display': ' MR', 'raw': ''},
+      {'display': ' MC', 'raw': ''},
+      {'display': 'sin(', 'raw': 'sin('},
+      {'display': 'cos(', 'raw': 'cos('},
+      {'display': 'tan(', 'raw': 'tan('},
+      {'display': 'log(', 'raw': 'log('},
+      {'display': 'ln(', 'raw': 'ln('},
+      {'display': '√', 'raw': 'sqrt('},
+      {'display': '²', 'raw': '^2'},
+      {'display': '³', 'raw': '^3'},
+      {'display': 'π', 'raw': 'pi'},
+      {'display': 'mod', 'raw': '%'},
+      {'display': '×', 'raw': '*'},
+      {'display': '÷', 'raw': '/'},
+      {'display': '−', 'raw': '-'},
+    ];
+
+    for (final token in complexTokens) {
+      final displayToken = token['display']!;
+      final rawToken = token['raw']!;
+
+      if (_displayInput.endsWith(displayToken)) {
+        _displayInput = _displayInput.substring(
+          0,
+          _displayInput.length - displayToken.length,
+        );
+
+        if (rawToken.isNotEmpty && _expression.endsWith(rawToken)) {
+          _expression = _expression.substring(
+            0,
+            _expression.length - rawToken.length,
+          );
+        } else if (rawToken.isEmpty && _expression.isNotEmpty) {
+          _expression = _expression.substring(0, _expression.length - 1);
+        }
+
+        if (_displayInput.isEmpty) {
+          _result = '';
+          _isTyping = false;
+        }
+
+        _errorMessage = '';
+        _hasEvaluated = false;
+        notifyListeners();
+        return;
+      }
+    }
+
+    _displayInput = _displayInput.substring(0, _displayInput.length - 1);
+
     if (_expression.isNotEmpty) {
       _expression = _expression.substring(0, _expression.length - 1);
-      _errorMessage = '';
-      notifyListeners();
     }
+
+    if (_displayInput.isEmpty) {
+      _result = '';
+      _isTyping = false;
+    }
+
+    _errorMessage = '';
+    _hasEvaluated = false;
+    notifyListeners();
+  }
+
+  void _deleteLastProgrammer() {
+    if (_expression.isEmpty) return;
+
+    _expression = _expression.substring(0, _expression.length - 1);
+    _displayInput = _displayInput.isNotEmpty
+        ? _displayInput.substring(0, _displayInput.length - 1)
+        : '';
+
+    if (_expression.isEmpty) {
+      _result = '';
+      _isTyping = false;
+    }
+
+    _errorMessage = '';
+    _hasEvaluated = false;
+    notifyListeners();
   }
 
   void toggleSign() {
+    if (_mode == CalculatorMode.programmer) return;
     if (_expression.isEmpty) return;
 
     if (_expression.startsWith('-')) {
       _expression = _expression.substring(1);
+
+      if (_displayInput.startsWith('-')) {
+        _displayInput = _displayInput.substring(1);
+      } else if (_displayInput.startsWith('−')) {
+        _displayInput = _displayInput.substring(1);
+      }
     } else {
       _expression = '-$_expression';
+      _displayInput = '−$_displayInput';
     }
+
+    _hasEvaluated = false;
     notifyListeners();
   }
 
   String evaluateExpression() {
+    if (_mode == CalculatorMode.programmer) {
+      return _evaluateProgrammerExpression();
+    }
+
     try {
       _errorMessage = '';
 
@@ -151,10 +390,67 @@ class CalculatorProvider extends ChangeNotifier {
 
       _result = evaluated;
       _previousResult = _result;
+      _isTyping = false;
+      _hasEvaluated = true;
       notifyListeners();
       return _result;
-    } catch (e) {
+    } catch (_) {
       _errorMessage = 'Lỗi biểu thức';
+      _hasEvaluated = false;
+      notifyListeners();
+      return _result;
+    }
+  }
+
+  String _evaluateProgrammerExpression() {
+    try {
+      _errorMessage = '';
+
+      if (_programmerPendingOperator == null) {
+        if (_expression.isEmpty) return _result;
+        final value = _parseProgrammerValue(_expression);
+        _result = _formatProgrammerValue(value);
+        _previousResult = _result;
+        _hasEvaluated = true;
+        _isTyping = false;
+        notifyListeners();
+        return _result;
+      }
+
+      if (_programmerStoredValue == null || _expression.isEmpty) {
+        _errorMessage = 'Thiếu toán hạng';
+        notifyListeners();
+        return _result;
+      }
+
+      final secondValue = _parseProgrammerValue(_expression);
+      final firstValue = _programmerStoredValue!;
+      int resultValue = 0;
+
+      switch (_programmerPendingOperator) {
+        case 'AND':
+          resultValue = firstValue & secondValue;
+          break;
+        case 'OR':
+          resultValue = firstValue | secondValue;
+          break;
+        case 'XOR':
+          resultValue = firstValue ^ secondValue;
+          break;
+      }
+
+      _result = _formatProgrammerValue(resultValue);
+      _previousResult = _result;
+      _displayInput = '${_displayInput}=';
+      _expression = _result;
+      _programmerStoredValue = null;
+      _programmerPendingOperator = null;
+      _hasEvaluated = true;
+      _isTyping = false;
+      notifyListeners();
+      return _result;
+    } catch (_) {
+      _errorMessage = 'Lỗi chế độ lập trình';
       notifyListeners();
       return _result;
     }
@@ -162,12 +458,22 @@ class CalculatorProvider extends ChangeNotifier {
 
   void useResultInExpression() {
     _expression = _result;
+    _displayInput = _result;
     _errorMessage = '';
+    _hasEvaluated = false;
     notifyListeners();
   }
 
   void setMode(CalculatorMode newMode) {
     _mode = newMode;
+    _programmerStoredValue = null;
+    _programmerPendingOperator = null;
+    _expression = '';
+    _displayInput = '';
+    _result = '';
+    _errorMessage = '';
+    _hasEvaluated = false;
+    _isTyping = false;
     saveSettings();
     notifyListeners();
   }
@@ -210,29 +516,94 @@ class CalculatorProvider extends ChangeNotifier {
 
   void memoryClear() {
     _memoryValue = 0;
+
+    if (_displayInput.isEmpty) {
+      _displayInput = 'MC';
+    } else {
+      _displayInput += ' MC';
+    }
+
+    _result = '';
+    _errorMessage = '';
+    _isTyping = true;
+    _hasEvaluated = false;
+
     saveSettings();
     notifyListeners();
   }
 
   void memoryRecall() {
-    _expression += _formatMemoryValue(_memoryValue);
+    final memoryText = _formatMemoryValue(_memoryValue);
+
+    _expression += memoryText;
+
+    if (_displayInput.isEmpty) {
+      _displayInput = 'MR';
+    } else {
+      _displayInput += ' MR';
+    }
+
+    _result = '';
+    _errorMessage = '';
+    _isTyping = true;
+    _hasEvaluated = false;
     notifyListeners();
   }
 
   void memoryAdd() {
     try {
-      final value = double.tryParse(evaluateExpression()) ?? 0;
+      final value = double.tryParse(
+            _result.isNotEmpty
+                ? _result
+                : (_expression.isNotEmpty ? evaluateExpression() : '0'),
+          ) ??
+          0;
+
       _memoryValue += value;
+
+      if (_displayInput.isEmpty) {
+        _displayInput = 'M+';
+      } else {
+        _displayInput += ' M+';
+      }
+
       saveSettings();
+
+      _expression = '';
+      _result = '';
+      _errorMessage = '';
+      _isTyping = true;
+      _hasEvaluated = false;
+
       notifyListeners();
     } catch (_) {}
   }
 
   void memorySubtract() {
     try {
-      final value = double.tryParse(evaluateExpression()) ?? 0;
+      final value = double.tryParse(
+            _result.isNotEmpty
+                ? _result
+                : (_expression.isNotEmpty ? evaluateExpression() : '0'),
+          ) ??
+          0;
+
       _memoryValue -= value;
+
+      if (_displayInput.isEmpty) {
+        _displayInput = 'M-';
+      } else {
+        _displayInput += ' M-';
+      }
+
       saveSettings();
+
+      _expression = '';
+      _result = '';
+      _errorMessage = '';
+      _isTyping = true;
+      _hasEvaluated = false;
+
       notifyListeners();
     } catch (_) {}
   }
@@ -241,55 +612,193 @@ class CalculatorProvider extends ChangeNotifier {
     switch (key) {
       case '1/x':
         _expression = '1/($_expression)';
+        _displayInput = '1/($_displayInput)';
         break;
       case 'n!':
         _expression = 'factorial($_expression)';
+        _displayInput = 'n!($_displayInput)';
         break;
       default:
         appendValue(key);
         return;
     }
+    _hasEvaluated = false;
     notifyListeners();
   }
 
   void applyProgrammerOperation(String op) {
     try {
-      final current = int.tryParse(_expression) ?? 0;
-      int resultValue = current;
+      _errorMessage = '';
+
+      if (['BIN', 'OCT', 'DEC', 'HEX'].contains(op)) {
+        _changeProgrammerBase(op);
+        return;
+      }
+
+      final currentValue = _getCurrentProgrammerValue();
 
       switch (op) {
         case 'NOT':
-          resultValue = ~current;
-          break;
+          if (currentValue == null) return;
+          final resultValue = ~currentValue;
+          _result = _formatProgrammerValue(resultValue);
+          _displayInput = _displayInput.isEmpty ? 'NOT' : 'NOT $_displayInput';
+          _expression = _result;
+          _previousResult = _result;
+          _hasEvaluated = true;
+          _isTyping = false;
+          notifyListeners();
+          return;
+
         case '<<1':
-          resultValue = current << 1;
-          break;
+          if (currentValue == null) return;
+          final resultValue = currentValue << 1;
+          _result = _formatProgrammerValue(resultValue);
+          _displayInput += _displayInput.isEmpty ? '<<1' : ' <<1';
+          _expression = _result;
+          _previousResult = _result;
+          _hasEvaluated = true;
+          _isTyping = false;
+          notifyListeners();
+          return;
+
         case '>>1':
-          resultValue = current >> 1;
-          break;
-        case 'BIN':
-          _result = current.toRadixString(2);
+          if (currentValue == null) return;
+          final resultValue = currentValue >> 1;
+          _result = _formatProgrammerValue(resultValue);
+          _displayInput += _displayInput.isEmpty ? '>>1' : ' >>1';
+          _expression = _result;
+          _previousResult = _result;
+          _hasEvaluated = true;
+          _isTyping = false;
           notifyListeners();
           return;
-        case 'OCT':
-          _result = current.toRadixString(8);
-          notifyListeners();
-          return;
-        case 'HEX':
-          _result = current.toRadixString(16).toUpperCase();
-          notifyListeners();
-          return;
-        case 'DEC':
-          _result = current.toString();
+
+        case 'AND':
+        case 'OR':
+        case 'XOR':
+          if (currentValue == null) return;
+          _programmerStoredValue = currentValue;
+          _programmerPendingOperator = op;
+          _displayInput += _displayInput.isEmpty ? op : ' $op ';
+          _expression = '';
+          _result = '';
+          _hasEvaluated = false;
+          _isTyping = true;
           notifyListeners();
           return;
       }
-
-      _result = resultValue.toString();
-      notifyListeners();
     } catch (_) {
       _errorMessage = 'Lỗi chế độ lập trình';
       notifyListeners();
+    }
+  }
+
+  void _changeProgrammerBase(String op) {
+    int newBase = 10;
+
+    switch (op) {
+      case 'BIN':
+        newBase = 2;
+        break;
+      case 'OCT':
+        newBase = 8;
+        break;
+      case 'DEC':
+        newBase = 10;
+        break;
+      case 'HEX':
+        newBase = 16;
+        break;
+    }
+
+    if (_expression.isEmpty && _result.isEmpty) {
+      _programmerBase = newBase;
+      notifyListeners();
+      return;
+    }
+
+    int? currentValue;
+
+    try {
+      if (_expression.isNotEmpty) {
+        currentValue = _parseWithAnySupportedBase(_expression, _programmerBase);
+      } else if (_result.isNotEmpty) {
+        currentValue = _parseWithAnySupportedBase(_result, _programmerBase);
+      }
+    } catch (_) {
+      currentValue = null;
+    }
+
+    _programmerBase = newBase;
+
+    if (currentValue != null) {
+      final converted = _formatProgrammerValue(currentValue);
+      _expression = converted;
+      _displayInput = converted;
+      _result = '';
+    }
+
+    _errorMessage = '';
+    _hasEvaluated = false;
+    notifyListeners();
+  }
+
+  int _parseWithAnySupportedBase(String text, int fallbackBase) {
+    final cleaned = text.trim().toUpperCase();
+
+    if (cleaned.startsWith('0X')) {
+      return int.parse(cleaned.substring(2), radix: 16);
+    }
+    if (cleaned.startsWith('0B')) {
+      return int.parse(cleaned.substring(2), radix: 2);
+    }
+    if (cleaned.startsWith('0O')) {
+      return int.parse(cleaned.substring(2), radix: 8);
+    }
+
+    return int.parse(cleaned, radix: fallbackBase);
+  }
+
+  int? _getCurrentProgrammerValue() {
+    if (_expression.isNotEmpty) {
+      return _parseProgrammerValue(_expression);
+    }
+    if (_result.isNotEmpty) {
+      return _parseProgrammerValue(_result);
+    }
+    return null;
+  }
+
+  int _parseProgrammerValue(String text) {
+    final cleaned = text.trim().toUpperCase();
+
+    if (cleaned.startsWith('0X')) {
+      return int.parse(cleaned.substring(2), radix: 16);
+    }
+    if (cleaned.startsWith('0B')) {
+      return int.parse(cleaned.substring(2), radix: 2);
+    }
+    if (cleaned.startsWith('0O')) {
+      return int.parse(cleaned.substring(2), radix: 8);
+    }
+
+    return int.parse(cleaned, radix: _programmerBase);
+  }
+
+  String _formatProgrammerValue(int value) {
+    switch (_programmerBase) {
+      case 2:
+        final text = value.toRadixString(2).toUpperCase();
+        return '0b$text';
+      case 8:
+        final text = value.toRadixString(8).toUpperCase();
+        return '0o$text';
+      case 16:
+        final text = value.toRadixString(16).toUpperCase();
+        return '0x$text';
+      default:
+        return value.toString();
     }
   }
 
@@ -312,6 +821,8 @@ class CalculatorProvider extends ChangeNotifier {
       }
 
       _result = resultValue.toString();
+      _displayInput += _displayInput.isEmpty ? op : ' $op';
+      _hasEvaluated = false;
       notifyListeners();
     } catch (_) {
       _errorMessage = 'Lỗi phép toán bit';
