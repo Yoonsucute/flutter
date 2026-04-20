@@ -1,4 +1,4 @@
-### pHẦN TEST
+### Phần TEST app
 1.	Complex expressions: (5 + 3) × 2 - 4 ÷ 2 = 14
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9c4e3091-21fb-4348-8ab2-a3309fa2cb28" />
 2.	Scientific calculations: sin(45°) + cos(45°) ≈ 1.414
