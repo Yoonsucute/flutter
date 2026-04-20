@@ -1,16 +1,15 @@
-# advancedcalculator
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/82c517e4-daf4-47d2-a42e-be1d71bfeeec" />1.	Complex expressions: (5 + 3) × 2 - 4 ÷ 2 = 14
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9c4e3091-21fb-4348-8ab2-a3309fa2cb28" />
+2.	Scientific calculations: sin(45°) + cos(45°) ≈ 1.414
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/97f845f7-538c-4f92-9af2-2f764f7c380e" />
+3.	Memory operations: 5 M+ 3 M+ MR = 8
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/25a3e2b0-6b63-480c-bff2-fe54b7b26fff" />
+4.	Chain calculations: 5 + 3 = + 2 = + 1 = 11
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c9a9391c-2df8-4a86-b5c2-b16cd1656ad7" />
+5.	Parentheses nesting: ((2 + 3) × (4 - 1)) ÷ 5 = 3
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/2cc2601e-db43-42f7-b622-d63d7176021a" />
+6.	Mixed scientific: 2 × π × √9 ≈ 18.85
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ef6f35f8-419d-4392-8a4f-59eba5ccf8f2" />
+7.	Programmer mode: 0xFF AND 0x0F = 0x0F
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/abb6ad64-90a2-4d3c-8404-b34933f87c95" />
