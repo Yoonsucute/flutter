@@ -195,7 +195,17 @@ class CalculatorProvider extends ChangeNotifier {
     if (!_isAllowedInCurrentBase(upper)) return;
 
     _expression += upper;
-    _displayInput += upper;
+
+    if (_programmerPendingOperator != null) {
+      final firstText = _programmerStoredValue != null
+          ? _formatValueWithBase(_programmerStoredValue!)
+          : '';
+      final secondText = _formatRawProgrammerInput(_expression);
+      _displayInput = '$firstText ${_programmerPendingOperator!} $secondText';
+    } else {
+      _displayInput = _formatRawProgrammerInput(_expression);
+    }
+
     _result = '';
     _isTyping = true;
     _hasEvaluated = false;
@@ -336,12 +346,43 @@ class CalculatorProvider extends ChangeNotifier {
   }
 
   void _deleteLastProgrammer() {
+    if (_programmerPendingOperator != null) {
+      if (_expression.isNotEmpty) {
+        _expression = _expression.substring(0, _expression.length - 1);
+
+        final firstText = _programmerStoredValue != null
+            ? _formatValueWithBase(_programmerStoredValue!)
+            : '';
+        final secondText = _formatRawProgrammerInput(_expression);
+
+        if (_expression.isEmpty) {
+          _displayInput = '$firstText ${_programmerPendingOperator!} ';
+          _result = '';
+          _isTyping = true;
+        } else {
+          _displayInput = '$firstText ${_programmerPendingOperator!} $secondText';
+        }
+      } else {
+        _programmerPendingOperator = null;
+        if (_programmerStoredValue != null) {
+          _expression = _programmerStoredValue!.toRadixString(_programmerBase).toUpperCase();
+          _displayInput = _formatRawProgrammerInput(_expression);
+        } else {
+          _expression = '';
+          _displayInput = '';
+        }
+      }
+
+      _errorMessage = '';
+      _hasEvaluated = false;
+      notifyListeners();
+      return;
+    }
+
     if (_expression.isEmpty) return;
 
     _expression = _expression.substring(0, _expression.length - 1);
-    _displayInput = _displayInput.isNotEmpty
-        ? _displayInput.substring(0, _displayInput.length - 1)
-        : '';
+    _displayInput = _formatRawProgrammerInput(_expression);
 
     if (_expression.isEmpty) {
       _result = '';
@@ -408,6 +449,7 @@ class CalculatorProvider extends ChangeNotifier {
 
       if (_programmerPendingOperator == null) {
         if (_expression.isEmpty) return _result;
+
         final value = _parseProgrammerValue(_expression);
         _result = _formatProgrammerValue(value);
         _previousResult = _result;
@@ -437,12 +479,19 @@ class CalculatorProvider extends ChangeNotifier {
         case 'XOR':
           resultValue = firstValue ^ secondValue;
           break;
+        default:
+          throw Exception('Toán tử không hỗ trợ');
       }
+
+      final operator = _programmerPendingOperator!;
+      final firstText = _formatValueWithBase(firstValue);
+      final secondText = _formatValueWithBase(secondValue);
 
       _result = _formatProgrammerValue(resultValue);
       _previousResult = _result;
-      _displayInput = '${_displayInput}=';
-      _expression = _result;
+      _displayInput = '$firstText $operator $secondText =';
+
+      _expression = resultValue.toRadixString(_programmerBase).toUpperCase();
       _programmerStoredValue = null;
       _programmerPendingOperator = null;
       _hasEvaluated = true;
@@ -642,8 +691,8 @@ class CalculatorProvider extends ChangeNotifier {
           if (currentValue == null) return;
           final resultValue = ~currentValue;
           _result = _formatProgrammerValue(resultValue);
-          _displayInput = _displayInput.isEmpty ? 'NOT' : 'NOT $_displayInput';
-          _expression = _result;
+          _displayInput = 'NOT ${_formatValueWithBase(currentValue)}';
+          _expression = resultValue.toRadixString(_programmerBase).toUpperCase();
           _previousResult = _result;
           _hasEvaluated = true;
           _isTyping = false;
@@ -654,8 +703,8 @@ class CalculatorProvider extends ChangeNotifier {
           if (currentValue == null) return;
           final resultValue = currentValue << 1;
           _result = _formatProgrammerValue(resultValue);
-          _displayInput += _displayInput.isEmpty ? '<<1' : ' <<1';
-          _expression = _result;
+          _displayInput = '${_formatValueWithBase(currentValue)} <<1';
+          _expression = resultValue.toRadixString(_programmerBase).toUpperCase();
           _previousResult = _result;
           _hasEvaluated = true;
           _isTyping = false;
@@ -666,8 +715,8 @@ class CalculatorProvider extends ChangeNotifier {
           if (currentValue == null) return;
           final resultValue = currentValue >> 1;
           _result = _formatProgrammerValue(resultValue);
-          _displayInput += _displayInput.isEmpty ? '>>1' : ' >>1';
-          _expression = _result;
+          _displayInput = '${_formatValueWithBase(currentValue)} >>1';
+          _expression = resultValue.toRadixString(_programmerBase).toUpperCase();
           _previousResult = _result;
           _hasEvaluated = true;
           _isTyping = false;
@@ -680,7 +729,7 @@ class CalculatorProvider extends ChangeNotifier {
           if (currentValue == null) return;
           _programmerStoredValue = currentValue;
           _programmerPendingOperator = op;
-          _displayInput += _displayInput.isEmpty ? op : ' $op ';
+          _displayInput = '${_formatValueWithBase(currentValue)} $op ';
           _expression = '';
           _result = '';
           _hasEvaluated = false;
@@ -733,9 +782,9 @@ class CalculatorProvider extends ChangeNotifier {
     _programmerBase = newBase;
 
     if (currentValue != null) {
-      final converted = _formatProgrammerValue(currentValue);
-      _expression = converted;
-      _displayInput = converted;
+      final convertedRaw = currentValue.toRadixString(_programmerBase).toUpperCase();
+      _expression = convertedRaw;
+      _displayInput = _formatRawProgrammerInput(convertedRaw);
       _result = '';
     }
 
@@ -789,16 +838,71 @@ class CalculatorProvider extends ChangeNotifier {
   String _formatProgrammerValue(int value) {
     switch (_programmerBase) {
       case 2:
-        final text = value.toRadixString(2).toUpperCase();
+        String text = value.toRadixString(2).toUpperCase();
+        if (text.length < 4) {
+          text = text.padLeft(4, '0');
+        }
         return '0b$text';
+
       case 8:
-        final text = value.toRadixString(8).toUpperCase();
+        String text = value.toRadixString(8).toUpperCase();
+        if (text.length < 2) {
+          text = text.padLeft(2, '0');
+        }
         return '0o$text';
+
       case 16:
-        final text = value.toRadixString(16).toUpperCase();
+        String text = value.toRadixString(16).toUpperCase();
+        if (text.length < 2) {
+          text = text.padLeft(2, '0');
+        }
         return '0x$text';
+
       default:
         return value.toString();
+    }
+  }
+
+  String _formatValueWithBase(int value) {
+    switch (_programmerBase) {
+      case 2:
+        String text = value.toRadixString(2).toUpperCase();
+        if (text.length < 4) {
+          text = text.padLeft(4, '0');
+        }
+        return '0b$text';
+
+      case 8:
+        String text = value.toRadixString(8).toUpperCase();
+        if (text.length < 2) {
+          text = text.padLeft(2, '0');
+        }
+        return '0o$text';
+
+      case 16:
+        String text = value.toRadixString(16).toUpperCase();
+        if (text.length < 2) {
+          text = text.padLeft(2, '0');
+        }
+        return '0x$text';
+
+      default:
+        return value.toString();
+    }
+  }
+
+  String _formatRawProgrammerInput(String raw) {
+    if (raw.isEmpty) return '';
+
+    switch (_programmerBase) {
+      case 2:
+        return '0b$raw';
+      case 8:
+        return '0o$raw';
+      case 16:
+        return '0x$raw';
+      default:
+        return raw;
     }
   }
 
