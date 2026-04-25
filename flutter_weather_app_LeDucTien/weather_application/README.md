@@ -1,6 +1,5 @@
 # weather_application
 Test the following scenarios:
-
 1.	Network Conditions:
 -App works with stable internet
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/51d4aad2-500d-4a2c-88ba-588d74228b89" />
@@ -41,10 +40,13 @@ Test the following scenarios:
 -	Loading states display properly
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ca0cd150-9202-432e-8d37-c52eeb4d1f5c" />
 -	Error states show helpful messages
-  
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a81e6960-5bd0-47bb-a5f1-eded7469d615" />
 -	Pull-to-refresh works
-
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/edd01740-5733-41e4-96cc-4c05b42274f9" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/51715350-7ac5-4703-9fce-6c4e588c7c3b" />
 -	Dynamic weather backgrounds
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8889c62f-93bc-4580-820b-8a15283f8723" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/69e8f1e4-32df-465f-9a16-eff7a85cf237" />
 
 
 
