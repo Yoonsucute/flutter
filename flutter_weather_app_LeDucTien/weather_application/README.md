@@ -1,155 +1,146 @@
 # Flutter Weather App
 
-## 1. Project Description
+## 1. Project description and features
 
-Flutter Weather App is a mobile weather application built with Flutter. The application uses OpenWeatherMap API to display real-time weather data, hourly forecast, and 5-day forecast. It also supports location-based weather, city search, offline cached data, favorite cities, pull-to-refresh, and temperature unit conversion.
+Flutter Weather App là một ứng dụng thời tiết được xây dựng bằng Flutter. Ứng dụng sử dụng OpenWeatherMap API để hiển thị thông tin thời tiết theo thời gian thực, dự báo theo giờ và dự báo 5 ngày. Ngoài ra, ứng dụng còn hỗ trợ lấy thời tiết theo vị trí hiện tại, tìm kiếm thời tiết theo tên thành phố, lưu dữ liệu offline bằng cache, kéo để làm mới, quản lý thành phố yêu thích, màn hình cài đặt và chuyển đổi đơn vị nhiệt độ.
 
-This project was developed for Lab 4 - Weather Application with API Integration.
+### Chức năng chính
 
-## 2. Features
+- Hiển thị thời tiết hiện tại.
+- Hiển thị tên thành phố và quốc gia.
+- Hiển thị trạng thái thời tiết kèm biểu tượng.
+- Hiển thị nhiệt độ hiện tại và nhiệt độ cảm giác như.
+- Hiển thị độ ẩm, tốc độ gió, áp suất, tầm nhìn và độ che phủ mây.
+- Hiển thị dự báo thời tiết theo giờ.
+- Hiển thị dự báo thời tiết 5 ngày.
+- Tìm kiếm thời tiết theo tên thành phố.
+- Lấy thời tiết theo vị trí hiện tại của người dùng.
+- Xử lý quyền truy cập vị trí.
+- Lưu dữ liệu thời tiết gần nhất để hỗ trợ chế độ offline.
+- Hiển thị dữ liệu cache khi không có mạng.
+- Hỗ trợ kéo xuống để làm mới dữ liệu.
+- Thay đổi màu nền theo điều kiện thời tiết.
+- Quản lý thành phố yêu thích.
+- Lưu lịch sử tìm kiếm gần đây.
+- Có màn hình cài đặt.
+- Chuyển đổi đơn vị nhiệt độ giữa độ C và độ F.
+- Xử lý trạng thái loading và trạng thái lỗi.
 
-### Core Features
+## 2. API setup instructions (without exposing keys!)
 
-- Display current weather information
-- Show city name and country
-- Show current temperature
-- Show weather description and weather icon
-- Show feels-like temperature
-- Show humidity, wind speed, pressure, visibility, and cloudiness
-- Display hourly weather forecast
-- Display 5-day weather forecast
-- Search weather by city name
-- Detect weather by current location
-- Handle location permission
-- Save last weather data for offline support
-- Show cached data when offline
-- Pull-to-refresh weather data
-- Dynamic weather background based on weather conditions
-- Favorite cities management
-- Recent search history
-- Settings screen
-- Temperature unit conversion between Celsius and Fahrenheit
-- Loading state and error state handling
+Dự án này sử dụng OpenWeatherMap API.
 
-### Error Handling
+### Bước 1: Lấy API Key
 
-The app handles common errors such as:
+Tạo tài khoản miễn phí trên OpenWeatherMap và lấy API key.
 
-- Invalid city name
-- Empty search input
-- Special characters in search input
-- No internet connection
-- Invalid API key
-- API timeout
-- API rate limit exceeded with HTTP status code 429
-- Location permission denied
+### Bước 2: Tạo file `.env`
 
-## 3. Technologies Used
+Tạo file `.env` trong thư mục gốc của dự án Flutter, cùng cấp với file `pubspec.yaml`.
 
-- Flutter
-- Dart
-- OpenWeatherMap API
-- Provider for state management
-- HTTP package for API requests
-- Geolocator for location services
-- Geocoding for reverse geocoding
-- Shared Preferences for offline caching
-- Flutter Dotenv for API key management
-- Cached Network Image for weather icons
-- Intl for date formatting
-
-## 4. API Setup
-
-This project uses OpenWeatherMap API.
-
-### Step 1: Get API Key
-
-Create a free account at OpenWeatherMap and get an API key.
-
-### Step 2: Create `.env` file
-
-Copy `.env.example` to `.env`.
+Thêm API key theo mẫu sau:
 
 ```env
-
 OPENWEATHER_API_KEY=your_actual_api_key_here
-Step 3: Keep API Key Secure
+```
 
-Do not commit .env to GitHub.
+Lưu ý: Không ghi API key thật vào README.
 
-The repository includes .env.example only:
+### Bước 3: Sử dụng file `.env.example`
 
+Repository chỉ đưa lên file `.env.example` để làm mẫu cấu hình.
+
+Nội dung file `.env.example`:
+
+```env
 OPENWEATHER_API_KEY=your_api_key_here
+```
 
-The .gitignore file includes:
+### Bước 4: Không để lộ API Key
 
+File `.env` thật không được đưa lên GitHub vì trong đó có API key thật.
+
+File `.gitignore` cần có:
+
+```gitignore
 .env
 build/
 .dart_tool/
-5. How to Run the Project
-Step 1: Clone the repository
+```
+
+## 3. Screenshots of different weather conditions
+
+### Màn hình chính / Thời tiết hiện tại
+<img width="1885" height="1069" alt="Màn hình chính" src="https://github.com/user-attachments/assets/531de4fc-9b06-491a-a156-a7de67e539d5" />
+### Màn hình tìm kiếm
+<img width="1919" height="1071" alt="Màn hình tìm kiếm" src="https://github.com/user-attachments/assets/b84205e4-e4a2-466f-8636-5adaabb61f54" />
+### Màn hình dự báo thời tiết
+<img width="1919" height="1079" alt="Màn hình dự báo thời tiết" src="https://github.com/user-attachments/assets/3d1e4811-dfac-4f56-84e7-8d0de9d5a3ce" />
+### Màn hình cài đặt
+<img width="1919" height="1079" alt="Màn hình cài đặt" src="https://github.com/user-attachments/assets/c071fefe-5dc8-4956-a3a9-ce11bf5e246d" />
+### Trạng thái đang tải dữ liệu
+<img width="1919" height="1078" alt="Trạng thái đang tải dữ liệu" src="https://github.com/user-attachments/assets/8a03dcb7-02d1-4a2f-82dc-fd9ed9ac177c" />
+### Trạng thái lỗi
+<img width="1919" height="1079" alt="Trạng thái lỗi" src="https://github.com/user-attachments/assets/a81e6960-5bd0-47bb-a5f1-eded7469d615" />
+### Dữ liệu offline đã lưu cache
+<img width="1919" height="1079" alt="Dữ liệu offline đã lưu cache" src="https://github.com/user-attachments/assets/a3262d9e-5163-4ffe-965c-4a816d30e812" />
+### Thời tiết mưa hoặc nhiều mây
+<img width="1912" height="1078" alt="Thời tiết mưa hoặc nhiều mây" src="https://github.com/user-attachments/assets/bfcd42be-caff-4f22-9fb2-627f5d4d45bd" />
+
+## 4. How to run the project
+
+### Bước 1: Tải hoặc clone repository
+```bash`
 git clone https://github.com/Yoonsucute/flutter.git
-Step 2: Open the project folder
-cd flutter_weather_app_LeDucTien/weather_application
-Step 3: Install dependencies
-flutter pub get
-Step 4: Add API key
+###Bước 2: Mở thư mục dự án               :  cd flutter_weather_app_LeDucTien/weather_application
+###Bước 3: Cài đặt các thư viện cần thiết :  flutter pub get
+###Bước 4: Tạo file .env
+"Tạo file .env trong thư 
+mục gốc của project,
+cùng cấp với file pubspec.yaml.
+Sau đó thêm API key theo mẫu sau       :  OPENWEATHER_API_KEY=your_actual_api_key_here"
+###Bước 5: Chạy ứng dụng                  :   flutter run
+###Bước 6: Chạy unit test                 :  flutter test
 
-Create a .env file and add your OpenWeatherMap API key:
+## 5. Công nghệ sử dụng
 
-OPENWEATHER_API_KEY=your_actual_api_key_here
-Step 5: Run the application
-flutter run
+Dự án này được xây dựng bằng các công nghệ và thư viện sau:
 
-# weather_application
-Test the following scenarios:
-1.	Network Conditions:
--App works with stable internet
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/51d4aad2-500d-4a2c-88ba-588d74228b89" />
--	App handles slow internet gracefully
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ca0cd150-9202-432e-8d37-c52eeb4d1f5c" />
--	App works offline with cached data
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a3262d9e-5163-4ffe-965c-4a816d30e812" />
--	App recovers when connection restored
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/102a5548-9c26-497b-9137-0ec669c9b74b" />
+- **Flutter**: Dùng để xây dựng ứng dụng di động.
+- **Dart**: Ngôn ngữ lập trình chính của dự án.
+- **OpenWeatherMap API**: Dùng để lấy dữ liệu thời tiết hiện tại và dự báo thời tiết.
+- **Provider**: Dùng để quản lý trạng thái của ứng dụng.
+- **HTTP**: Dùng để gửi yêu cầu API và nhận dữ liệu phản hồi từ server.
+- **Geolocator**: Dùng để lấy vị trí hiện tại của người dùng.
+- **Geocoding**: Dùng để chuyển đổi tọa độ thành thông tin địa điểm.
+- **Shared Preferences**: Dùng để lưu dữ liệu thời tiết tạm thời, hỗ trợ chế độ offline.
+- **Flutter Dotenv**: Dùng để quản lý API key thông qua file `.env`.
+- **Cached Network Image**: Dùng để hiển thị và cache biểu tượng thời tiết.
+- **Intl**: Dùng để định dạng ngày giờ.
+- **Android Emulator**: Dùng để chạy và kiểm thử ứng dụng.
 
-2.	Location Permissions:
--	Permission granted - fetches location weather
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5b011bf7-6644-4043-824e-c1abb1936676" />
--	Permission denied - shows manual search
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a81e6960-5bd0-47bb-a5f1-eded7469d615" />
--	Permission denied forever - clear instructions
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a81e6960-5bd0-47bb-a5f1-eded7469d615" />
+## 6. Hạn chế của ứng dụng
 
-3.	Search Functionality:
--	Valid city name returns weather
-<img width="1219" height="1079" alt="image" src="https://github.com/user-attachments/assets/72ecddd7-e07f-428a-bea6-404cf71cb63d" />
--	Invalid city shows error message
-<img width="1914" height="1079" alt="image" src="https://github.com/user-attachments/assets/43a32dad-0d47-43e7-980b-cca9ee6e0bb0" />
--	Empty search handled properly
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/af547f22-e1f5-48d0-968c-7494631b83e5" />
--	Special characters handled
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/fc67b024-ae4a-4ec2-95bb-7ed7fd44fe9f" />
-4.	API Scenarios:
--	API responds successfully
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/aa65917a-5607-4eda-8fe9-6af4d3b3c80e" />
--	API rate limit exceeded
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/6ed488d1-eff7-485f-a754-db87cb7e6a9c" />
--	Invalid API key
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/628e82d7-5c81-46cf-b21a-c19bac78dae2" />
--	API timeout
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9cbaba40-f4ea-4ee8-8406-5086a645891a" />
-5.	UI Responsiveness:
--	Loading states display properly
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ca0cd150-9202-432e-8d37-c52eeb4d1f5c" />
--	Error states show helpful messages
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a81e6960-5bd0-47bb-a5f1-eded7469d615" />
--	Pull-to-refresh works
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/edd01740-5733-41e4-96cc-4c05b42274f9" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/51715350-7ac5-4703-9fce-6c4e588c7c3b" />
--	Dynamic weather backgrounds
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/8889c62f-93bc-4580-820b-8a15283f8723" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/69e8f1e4-32df-465f-9a16-eff7a85cf237" />
+- Ứng dụng phụ thuộc vào OpenWeatherMap API, nên nếu API gặp sự cố thì ứng dụng có thể không lấy được dữ liệu mới.
+- Gói miễn phí của OpenWeatherMap có giới hạn số lần gọi API.
+- API key mới tạo có thể cần một khoảng thời gian để được kích hoạt.
+- Ứng dụng cần kết nối Internet để tải dữ liệu thời tiết mới.
+- Chế độ offline chỉ hiển thị dữ liệu thời tiết đã được lưu cache gần nhất.
+- Ứng dụng chưa hỗ trợ bản đồ thời tiết hoặc radar thời tiết.
+- Ứng dụng chưa hỗ trợ cảnh báo thời tiết.
+- Ứng dụng chưa hiển thị chỉ số chất lượng không khí.
+- Ứng dụng chủ yếu được kiểm thử trên Android Emulator.
+- Chưa kiểm thử trên iOS do không có thiết bị iOS.
 
+## 7. Hướng phát triển trong tương lai
 
-
+- Thêm chức năng cảnh báo thời tiết và thông báo cho người dùng.
+- Thêm thông tin chỉ số chất lượng không khí.
+- Thêm bản đồ thời tiết hoặc radar thời tiết.
+- Thêm cơ chế dự phòng bằng nhiều API thời tiết khác nhau.
+- Thêm hiệu ứng hoạt hình cho các trạng thái thời tiết.
+- Hỗ trợ nhiều ngôn ngữ.
+- Cải thiện giao diện bằng các biểu tượng thời tiết tùy chỉnh.
+- Thêm widget thời tiết ngoài màn hình chính Android.
+- Bổ sung thêm nhiều unit test để kiểm thử ứng dụng đầy đủ hơn.
+- Cải thiện khả năng truy cập và trải nghiệm người dùng.
