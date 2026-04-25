@@ -1,3 +1,106 @@
+# Flutter Weather App
+
+## 1. Project Description
+
+Flutter Weather App is a mobile weather application built with Flutter. The application uses OpenWeatherMap API to display real-time weather data, hourly forecast, and 5-day forecast. It also supports location-based weather, city search, offline cached data, favorite cities, pull-to-refresh, and temperature unit conversion.
+
+This project was developed for Lab 4 - Weather Application with API Integration.
+
+## 2. Features
+
+### Core Features
+
+- Display current weather information
+- Show city name and country
+- Show current temperature
+- Show weather description and weather icon
+- Show feels-like temperature
+- Show humidity, wind speed, pressure, visibility, and cloudiness
+- Display hourly weather forecast
+- Display 5-day weather forecast
+- Search weather by city name
+- Detect weather by current location
+- Handle location permission
+- Save last weather data for offline support
+- Show cached data when offline
+- Pull-to-refresh weather data
+- Dynamic weather background based on weather conditions
+- Favorite cities management
+- Recent search history
+- Settings screen
+- Temperature unit conversion between Celsius and Fahrenheit
+- Loading state and error state handling
+
+### Error Handling
+
+The app handles common errors such as:
+
+- Invalid city name
+- Empty search input
+- Special characters in search input
+- No internet connection
+- Invalid API key
+- API timeout
+- API rate limit exceeded with HTTP status code 429
+- Location permission denied
+
+## 3. Technologies Used
+
+- Flutter
+- Dart
+- OpenWeatherMap API
+- Provider for state management
+- HTTP package for API requests
+- Geolocator for location services
+- Geocoding for reverse geocoding
+- Shared Preferences for offline caching
+- Flutter Dotenv for API key management
+- Cached Network Image for weather icons
+- Intl for date formatting
+
+## 4. API Setup
+
+This project uses OpenWeatherMap API.
+
+### Step 1: Get API Key
+
+Create a free account at OpenWeatherMap and get an API key.
+
+### Step 2: Create `.env` file
+
+Copy `.env.example` to `.env`.
+
+```env
+
+OPENWEATHER_API_KEY=your_actual_api_key_here
+Step 3: Keep API Key Secure
+
+Do not commit .env to GitHub.
+
+The repository includes .env.example only:
+
+OPENWEATHER_API_KEY=your_api_key_here
+
+The .gitignore file includes:
+
+.env
+build/
+.dart_tool/
+5. How to Run the Project
+Step 1: Clone the repository
+git clone https://github.com/Yoonsucute/flutter.git
+Step 2: Open the project folder
+cd flutter_weather_app_LeDucTien/weather_application
+Step 3: Install dependencies
+flutter pub get
+Step 4: Add API key
+
+Create a .env file and add your OpenWeatherMap API key:
+
+OPENWEATHER_API_KEY=your_actual_api_key_here
+Step 5: Run the application
+flutter run
+
 # weather_application
 Test the following scenarios:
 1.	Network Conditions:
