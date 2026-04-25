@@ -32,7 +32,19 @@ Test the following scenarios:
 -	API responds successfully
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/aa65917a-5607-4eda-8fe9-6af4d3b3c80e" />
 -	API rate limit exceeded
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/e0c77325-290c-40e5-965a-9504ef99512d" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/6ed488d1-eff7-485f-a754-db87cb7e6a9c" />
 -	Invalid API key
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/628e82d7-5c81-46cf-b21a-c19bac78dae2" />
+-	API timeout
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/9cbaba40-f4ea-4ee8-8406-5086a645891a" />
+5.	UI Responsiveness:
+-	Loading states display properly
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/ca0cd150-9202-432e-8d37-c52eeb4d1f5c" />
+-	Error states show helpful messages
+  
+-	Pull-to-refresh works
+
+-	Dynamic weather backgrounds
+
+
 
