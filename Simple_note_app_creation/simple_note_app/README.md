@@ -1,8 +1,7 @@
 # Video Demo
 https://drive.google.com/file/d/17RDw7_yLTiahe7Fkw_ugvvBL8ToGstnH/view?usp=sharing
 # Getting Started
-# Run application
-flutter run
+# Run application:  "flutter run"
 
 ##Home Screen
 ![alt text](image.png)
